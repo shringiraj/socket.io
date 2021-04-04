@@ -27,16 +27,15 @@ function postComment(comment) {
     // Broadcast
     broadcastComment(data);
     //store in database
-    
+    syncWithDb(data);
 }
-fetch('https://jsonplaceholder.typicode.com/comments')
-        .then(response => response.json())
-        .then(json =>{
-            json.forEach(comment => {
-                comment
-                appendComment({username:comment.email,comment:comment.body})
-            });
-        })
+fetch('/api/comments')
+    .then(response => response.json())
+    .then(json => {
+        json.forEach(comment => {
+            appendComment(comment)
+        });
+    })
 function appendComment(data) {
     let lTag = document.createElement('li');
 
@@ -61,3 +60,14 @@ function broadcastComment(data) {
 socket.on('comment', (data) => {
     appendComment(data);
 })
+
+function syncWithDb(data) {
+    headers = {
+        "Content-Type": "application/json",
+    }
+    fetch("/api/comment", { method: 'post', body: data, headers })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+        })
+}
