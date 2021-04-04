@@ -26,8 +26,17 @@ function postComment(comment) {
     appendComment(data);
     // Broadcast
     broadcastComment(data);
+    //store in database
+    
 }
-
+fetch('https://jsonplaceholder.typicode.com/comments')
+        .then(response => response.json())
+        .then(json =>{
+            json.forEach(comment => {
+                comment
+                appendComment({username:comment.email,comment:comment.body})
+            });
+        })
 function appendComment(data) {
     let lTag = document.createElement('li');
 
@@ -41,14 +50,14 @@ function appendComment(data) {
         </div>
     `
     lTag.innerHTML = markup;
-    console.log(lTag)
+    // console.log(lTag)
     comments.prepend(lTag)
     commentBox.value = '';
 }
 function broadcastComment(data) {
-    socket.emit('comment',data);
+    socket.emit('comment', data);
 }
 
-socket.on('comment',(data)=>{
+socket.on('comment', (data) => {
     appendComment(data);
 })
